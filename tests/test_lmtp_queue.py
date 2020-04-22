@@ -3,8 +3,8 @@ from smtplib import SMTP
 
 import pytest
 
+from tmpmail import lmtp
 from tmpmail.config import Config
-from tmpmail.lmtp import lmtp_server
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def config():
 
 @pytest.fixture
 async def mail_q(config):
-    async with lmtp_server(config=config) as q:
+    async with lmtp.server(config=config) as q:
         yield q
 
 

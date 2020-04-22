@@ -11,8 +11,8 @@ import typing as t
 
 import trafaret as tr
 
+from tmpmail import lmtp
 from tmpmail.config import Config, acquire_config
-from tmpmail.lmtp import lmtp_server
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ async def async_main(config: Config) -> None:
     """Run the lmtp and websocket servers until signalled."""
     async with contextlib.AsyncExitStack() as stack:
         caught_sig = stack.enter_context(catch_signals())
-        _ = await stack.enter_async_context(lmtp_server(config))
+        _ = await stack.enter_async_context(lmtp.server(config))
 
         await caught_sig
 
