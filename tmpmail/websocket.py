@@ -91,7 +91,11 @@ async def inbox(request: web.Request) -> web.WebSocketResponse:
     try:
         await ws.receive()
         await ws.send_json({"type": "addr", "addr": addr})
-        await ws.receive()
+        while True:
+            # ping every 10s and discard pongs
+            await asyncio.sleep(10.0)
+            ws.send_json({"type": "ping"})
+            msg = await ws.receive_json()
     finally:
         del request.app["inboxes"][addr]
         await ws.close()

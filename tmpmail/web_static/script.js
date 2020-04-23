@@ -30,8 +30,9 @@
 			}
 			addr = msg.addr;
 			nav.innerText = addr;
-		} else {
-			// add message on subsequent messages to the first
+		} else if (msg.type === 'ping') {
+			sock.send(JSON.stringify({'type': 'pong'}));
+		} else if (msg.type === 'message') {
 			append_message(msg);
 		}
 	});
@@ -45,10 +46,6 @@
 
 	function append_message(msg) {
 		const main = document.getElementsByTagName('main')[0];
-		if (msg.type !== 'message') {
-			console.log('protocol violation: did not get `message` message');
-			return;
-		}
 
 		const new_msg = document.createElement('div');
 		const subject = document.createElement('h3');
