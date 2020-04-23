@@ -12,6 +12,7 @@ aiosmtpd = "^1.2"
 trafaret = "^2.0.2"
 janus = "^0.4.0"
 pytest-asyncio = "^0.11.0"
+aiohttp_jinja2 = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

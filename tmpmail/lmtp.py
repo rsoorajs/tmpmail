@@ -16,16 +16,23 @@ logger = logging.getLogger(__name__)
 
 
 @contextlib.asynccontextmanager
-async def server(config: Config) -> t.AsyncIterator[Queue[Message]]:
-    """Manage the LMTP server's lifetime, returning a queue of messages received."""
+async def server(*, config: Config) -> t.AsyncIterator[Queue[Message]]:
+    """Manage the LMTP server's lifetime.
+
+    Args:
+        config: application configuration.
+
+    Yields:
+        Queue of incoming mail.
+    """
     msg_queue: Queue[Message] = Queue()
     controller = Controller(
         handler=LmtpHandler(config=config, queue=msg_queue),
-        hostname=config.mail_domain,
+        hostname=config.lmtp_host,
         port=config.lmtp_port,
     )
     controller.start()
-    logger.info(f"listening on {config.mail_domain}:{config.lmtp_port}")
+    logger.info(f"listening on {config.lmtp_host}:{config.lmtp_port}")
     yield msg_queue
     controller.stop()
 

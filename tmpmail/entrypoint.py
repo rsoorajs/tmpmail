@@ -11,7 +11,7 @@ import typing as t
 
 import trafaret as tr
 
-from tmpmail import lmtp
+from tmpmail import lmtp, websocket
 from tmpmail.config import Config, acquire_config
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,7 @@ def main() -> None:
         logging.basicConfig(
             level=logging.INFO, format="%(levelname)-7s %(name)-32s %(message)s"
         )
+        logging.getLogger("mail.log").disabled = True
         asyncio.run(async_main(config))
     except tr.DataError as e:
         logger.error(f"configuration is invalid: {e}")
@@ -37,8 +38,10 @@ async def async_main(config: Config) -> None:
     """Run the lmtp and websocket servers until signalled."""
     async with contextlib.AsyncExitStack() as stack:
         caught_sig = stack.enter_context(catch_signals())
-        _ = await stack.enter_async_context(lmtp.server(config))
+        msg_q = await stack.enter_async_context(lmtp.server(config=config))
+        await stack.enter_async_context(websocket.server(config=config, msg_q=msg_q))
 
+        logger.info("tmpmail ready")
         await caught_sig
 
 
