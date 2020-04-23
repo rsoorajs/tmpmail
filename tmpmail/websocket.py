@@ -106,7 +106,7 @@ async def drain_q(
     """Deliver each incoming message to the correct recipient/s, if any."""
     while True:
         msg = await msg_q.async_q.get()
-        tos = msg.get_all("To")
+        tos = msg['X-RcptTo'].split(', ')
         froms = msg.get_all("From")
         subject = msg.get("Subject")
         payload = msg.get_payload()
@@ -115,8 +115,8 @@ async def drain_q(
                 await inboxes[to].send_json(
                     {
                         "type": "message",
-                        "to": tos,
-                        "from": froms,
+                        "tos": tos,
+                        "froms": froms,
                         "subject": subject,
                         "payload": payload,
                     }
